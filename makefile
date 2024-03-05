@@ -1,5 +1,7 @@
+OBJECT_FILES = $(wildcard out/*.o)
+
 app: main.o
-	g++ main.o --std=c++20 -o app
+	g++ $(OBJECT_FILES) --std=c++20 -o out/xoapp
 
 main.o: main.cpp
-	g++ -c main.cpp --std=c++20
+	g++ -c main.cpp --std=c++20 -o out/main.o
