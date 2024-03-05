@@ -1,5 +1,11 @@
 #include <iostream>
+#include "game/xo_game.h"
 
 int main() {
-  std::cout << "Hello, World! and so help me God" << std::endl;
+  int board[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  XOGame game;
+  game.play();
+
+  return 0;
 }
