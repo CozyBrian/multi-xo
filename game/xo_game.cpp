@@ -2,19 +2,6 @@
 #include <iostream>
 #include <ctype.h>
 
-void eraselines(int count) {
-    if (count > 0) {
-        std::cout << "\x1b[2k"; // delete current line
-        // i=1 because we included the first line
-        for (int i = 1; i < count; i++) {
-            std::cout
-            << "\x1b[1a" // move cursor up one
-            << "\x1b[2k"; // delete the entire line
-        }
-        std::cout << "\r"; // resume the cursor at beginning of line
-    }
-}
-
 XOGame::XOGame() {
   for (int i = 0; i < 9; ++i) {
     this->board[i] = 0;
@@ -22,7 +9,7 @@ XOGame::XOGame() {
 }
 
 void XOGame::printBoard(int board[]) {
-  // system("clear");
+  system("clear");
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
         std::cout << " " << board[i * 3 + j] << " ";
@@ -35,26 +22,40 @@ void XOGame::printBoard(int board[]) {
 
 void XOGame::getMove() {
   std::cout << "Player " << this->turn << " move: ";
+  std::string input;
   char move;
-  std::cin >> move;
+  std::cin >> input;
 
-  std::cout << "Move: " << move << std::endl;
+  if (input[0] == '!') {
+    input.erase(0, 1);
+    if (input == "exit") {
+      return exit(0);
+    } else {
+      std::cout << "Invalid command" << std::endl;
+      return this->getMove();
+    }
+  }
+
+  if (input.length() != 1) {
+    std::cout << "Invalid move" << std::endl;
+    return this->getMove();
+  }
+
+  move = input[0];
+
 
   if (!isdigit(move)) {
-    eraselines(1);
     std::cout << "Invalid move" << std::endl;
     return this->getMove();
   }
 
   int moveInt = move - '0';
   if (moveInt < 1 || moveInt > 9) {
-    eraselines(1);
     std::cout << "Invalid move" << std::endl;
     return this->getMove();
   }
 
   if (this->board[moveInt - 1] != 0) {
-    eraselines(1);
     std::cout << "Invalid move" << std::endl;
     return this->getMove();
   }

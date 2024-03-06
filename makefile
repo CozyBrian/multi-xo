@@ -8,3 +8,9 @@ main.o: main.cpp
 
 xo_game.o: game/xo_game.cpp
 	g++ -c game/xo_game.cpp --std=c++20 -o out/xo_game.o
+
+test: main.cpp
+	g++ main.cpp -lncurses -o out/test
+
+clean:
+	rm out/*.o out/xoapp out/test
