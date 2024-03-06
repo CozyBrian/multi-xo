@@ -1,6 +1,7 @@
 #include "xo_game.h"
 #include <iostream>
 #include <ctype.h>
+#include <ncurses.h>
 
 XOGame::XOGame() {
   for (int i = 0; i < 9; ++i) {
@@ -9,15 +10,35 @@ XOGame::XOGame() {
 }
 
 void XOGame::printBoard(int board[]) {
-  system("clear");
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-        std::cout << " " << board[i * 3 + j] << " ";
-        if (j < 2) std::cout << "|"; // Add vertical lines between cells
+    clear(); // Clear the screen before printing the board
+    int row = 0;
+    for (int i = 0; i < 3; ++i) {
+        int col = 0;
+        for (int j = 0; j < 3; ++j) {
+            mvprintw(row, col, " %d ", board[i * 3 + j]);
+            if (j < 2) mvprintw(row, col + 3, "|"); // Add vertical lines between cells
+            col += 5;
+        }
+        if (i < 2) mvprintw(row + 1, 0, "-----------"); // Add horizontal lines between rows
+        row += 2;
     }
-    std::cout << std::endl;
-    if (i < 2) std::cout << "-----------" << std::endl; // Add horizontal lines between rows
-  }
+    refresh(); // Refresh the screen after printing the board
+}
+
+void XOGame::printBoard(char board[]) {
+    clear(); // Clear the screen before printing the board
+    int row = 0;
+    for (int i = 0; i < 3; ++i) {
+        int col = 0;
+        for (int j = 0; j < 3; ++j) {
+            mvprintw(row, col, " %c ", board[i * 3 + j]);
+            if (j < 2) mvprintw(row, col + 3, "|"); // Add vertical lines between cells
+            col += 5;
+        }
+        if (i < 2) mvprintw(row + 1, 0, "-----------"); // Add horizontal lines between rows
+        row += 2;
+    }
+    refresh(); // Refresh the screen after printing the board
 }
 
 void XOGame::getMove() {
@@ -64,9 +85,14 @@ void XOGame::getMove() {
 }
 
 void XOGame::play() {
-  while (this->winner == 0)
-  {
+  initscr();
+
+  // while (this->winner == 0)
+  // {
     this->printBoard(this->board);
-    this->getMove();
-  }
+    // this->getMove();
+  // }
+  getch();
+
+  endwin();
 }

@@ -7,6 +7,7 @@ class XOGame {
     int turn = 1;
     int winner = 0;
     void printBoard(int board[]);
+    void printBoard(char board[]);
     void getMove();
     /* data */
   public:
