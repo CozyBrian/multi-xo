@@ -2,6 +2,8 @@
 #include <iostream>
 #include <ctype.h>
 #include <ncurses.h>
+#include <unistd.h>
+
 
 XOGame::XOGame() {
   for (int i = 0; i < 9; ++i) {
@@ -17,7 +19,7 @@ void XOGame::printBoard(int board[]) {
         for (int j = 0; j < 3; ++j) {
             mvprintw(row, col, " %d ", board[i * 3 + j]);
             if (j < 2) mvprintw(row, col + 3, "|"); // Add vertical lines between cells
-            col += 5;
+            col += 4;
         }
         if (i < 2) mvprintw(row + 1, 0, "-----------"); // Add horizontal lines between rows
         row += 2;
@@ -33,7 +35,7 @@ void XOGame::printBoard(char board[]) {
         for (int j = 0; j < 3; ++j) {
             mvprintw(row, col, " %c ", board[i * 3 + j]);
             if (j < 2) mvprintw(row, col + 3, "|"); // Add vertical lines between cells
-            col += 5;
+            col += 4;
         }
         if (i < 2) mvprintw(row + 1, 0, "-----------"); // Add horizontal lines between rows
         row += 2;
@@ -42,55 +44,68 @@ void XOGame::printBoard(char board[]) {
 }
 
 void XOGame::getMove() {
-  std::cout << "Player " << this->turn << " move: ";
-  std::string input;
-  char move;
-  std::cin >> input;
+  mvprintw(6, 0, "player %d move: ", this->turn);
+  refresh();
+  char ch = getch();
 
-  if (input[0] == '!') {
-    input.erase(0, 1);
-    if (input == "exit") {
-      return exit(0);
-    } else {
-      std::cout << "Invalid command" << std::endl;
-      return this->getMove();
-    }
-  }
-
-  if (input.length() != 1) {
-    std::cout << "Invalid move" << std::endl;
-    return this->getMove();
-  }
-
-  move = input[0];
-
-
-  if (!isdigit(move)) {
-    std::cout << "Invalid move" << std::endl;
-    return this->getMove();
-  }
-
-  int moveInt = move - '0';
-  if (moveInt < 1 || moveInt > 9) {
-    std::cout << "Invalid move" << std::endl;
-    return this->getMove();
-  }
-
-  if (this->board[moveInt - 1] != 0) {
-    std::cout << "Invalid move" << std::endl;
-    return this->getMove();
-  }
-
-  this->board[moveInt - 1] = this->turn;
+  printw("%c", ch);
+  refresh();
 }
+// void XOGame::getMove() {
+//   std::cout << "Player " << this->turn << " move: ";
+//   std::string input;
+//   char move;
+//   std::cin >> input;
+
+//   if (input[0] == '!') {
+//     input.erase(0, 1);
+//     if (input == "exit") {
+//       return exit(0);
+//     } else {
+//       std::cout << "Invalid command" << std::endl;
+//       return this->getMove();
+//     }
+//   }
+
+//   if (input.length() != 1) {
+//     std::cout << "Invalid move" << std::endl;
+//     return this->getMove();
+//   }
+
+//   move = input[0];
+
+
+//   if (!isdigit(move)) {
+//     std::cout << "Invalid move" << std::endl;
+//     return this->getMove();
+//   }
+
+//   int moveInt = move - '0';
+//   if (moveInt < 1 || moveInt > 9) {
+//     std::cout << "Invalid move" << std::endl;
+//     return this->getMove();
+//   }
+
+//   if (this->board[moveInt - 1] != 0) {
+//     std::cout << "Invalid move" << std::endl;
+//     return this->getMove();
+//   }
+
+//   this->board[moveInt - 1] = this->turn;
+// }
 
 void XOGame::play() {
   initscr();
+  int fps = 0;
 
   // while (this->winner == 0)
   // {
+    fps += 1;
     this->printBoard(this->board);
-    // this->getMove();
+    this->getMove();
+    mvprintw(8, 12, "fps: %d", fps);
+    refresh();
+    // usleep(10000); // 60 fps
   // }
   getch();
 
