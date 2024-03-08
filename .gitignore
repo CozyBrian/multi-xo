@@ -1,3 +1,6 @@
 out/*.o
 xoapp
 output
+test
+
+.vscode

@@ -6,13 +6,16 @@
 
 
 XOGame::XOGame() {
+  this->turn = 1;
+  this->winner = 0;
   for (int i = 0; i < 9; ++i) {
     this->board[i] = 0;
   }
 }
 
 void XOGame::printBoard(int board[]) {
-    clear(); // Clear the screen before printing the board
+    // clear(); // Clear the screen before printing the board
+    attron(A_BOLD); // Make the text bold
     int row = 0;
     for (int i = 0; i < 3; ++i) {
         int col = 0;
@@ -24,6 +27,7 @@ void XOGame::printBoard(int board[]) {
         if (i < 2) mvprintw(row + 1, 0, "-----------"); // Add horizontal lines between rows
         row += 2;
     }
+    attroff(A_BOLD); // Turn off the bold text
     refresh(); // Refresh the screen after printing the board
 }
 
@@ -46,67 +50,118 @@ void XOGame::printBoard(char board[]) {
 void XOGame::getMove() {
   mvprintw(6, 0, "player %d move: ", this->turn);
   refresh();
-  char ch = getch();
+  bool invalid = false;
+  char ch;
+  echo();
+  ch = getch();
+  char command[32];
 
-  printw("%c", ch);
-  refresh();
+  if (ch == '!') {
+    getstr(command);
+    if (strcmp(command, "exit") == 0) {
+      endwin(); 
+      return exit(0);
+    } else {
+      mvprintw(7, 0, "Invalid command \"%s\"", command);
+      refresh();
+      getch();
+      return;
+    }
+  }
+
+  if (!isdigit(ch)) {
+    mvprintw(7, 0, "Invalid move \"%c\"", ch);
+    refresh();
+    getch();
+    return;
+  }
+
+  int move = ch - '0';
+
+  getch();
+  if (move < 1 || move > 9) {
+    mvprintw(7, 0, "Invalid move \"%c\"", ch);
+    refresh();
+    getch();
+    return;
+  }
+  
+  if (this->board[move - 1] != 0) {
+    mvprintw(7, 0, "Invalid move \"%c\"", ch);
+    refresh();
+    getch();
+    return;
+  }
+  
+  this->board[move - 1] = this->turn;
+  if (this->turn == 1) {
+    this->turn = 2;
+  } else {
+    this->turn = 1;
+  }
 }
-// void XOGame::getMove() {
-//   std::cout << "Player " << this->turn << " move: ";
-//   std::string input;
-//   char move;
-//   std::cin >> input;
 
-//   if (input[0] == '!') {
-//     input.erase(0, 1);
-//     if (input == "exit") {
-//       return exit(0);
-//     } else {
-//       std::cout << "Invalid command" << std::endl;
-//       return this->getMove();
-//     }
-//   }
+void XOGame::checkWinner() {
+  for (int i = 0; i < 3; ++i) {
+    // Check rows
+    if (this->board[i * 3] == this->board[i * 3 + 1] && this->board[i * 3] == this->board[i * 3 + 2] && this->board[i * 3] != 0) {
+      this->winner = this->board[i * 3];
+      return;
+    }
+    // Check columns
+    if (this->board[i] == this->board[i + 3] && this->board[i] == this->board[i + 6] && this->board[i] != 0) {
+      this->winner = this->board[i];
+      return;
+    }
+  }
+  // Check diagonals
+  if (this->board[0] == this->board[4] && this->board[0] == this->board[8] && this->board[0] != 0) {
+    this->winner = this->board[0];
+    return;
+  }
+  if (this->board[2] == this->board[4] && this->board[2] == this->board[6] && this->board[2] != 0) {
+    this->winner = this->board[2];
+    return;
+  }
+  
+  // Check for draw
+  for (int i = 0; i < 9; ++i) {
+    if (this->board[i] == 0) {
+      return;
+    }
+  }
+  this->winner = 3;
 
-//   if (input.length() != 1) {
-//     std::cout << "Invalid move" << std::endl;
-//     return this->getMove();
-//   }
+}
 
-//   move = input[0];
-
-
-//   if (!isdigit(move)) {
-//     std::cout << "Invalid move" << std::endl;
-//     return this->getMove();
-//   }
-
-//   int moveInt = move - '0';
-//   if (moveInt < 1 || moveInt > 9) {
-//     std::cout << "Invalid move" << std::endl;
-//     return this->getMove();
-//   }
-
-//   if (this->board[moveInt - 1] != 0) {
-//     std::cout << "Invalid move" << std::endl;
-//     return this->getMove();
-//   }
-
-//   this->board[moveInt - 1] = this->turn;
-// }
+void XOGame::printResult() {
+  if (this->winner == 1) {
+    mvprintw(8, 0, "Player 1 wins!");
+  } else if (this->winner == 2) {
+    mvprintw(8, 0, "Player 2 wins!");
+  } else {
+    mvprintw(8, 0, "It's a draw!");
+  }
+  refresh();
+  getch();
+}
 
 void XOGame::play() {
   initscr();
+  cbreak();
+  
   int fps = 0;
 
-  // while (this->winner == 0)
-  // {
-    fps += 1;
+  while (this->winner == 0)
+  {
+    clear();
     this->printBoard(this->board);
     this->getMove();
-    mvprintw(8, 12, "fps: %d", fps);
+    this->printBoard(this->board);
+    this->checkWinner();
     refresh();
-    // usleep(10000); // 60 fps
-  // }
+  }
+  this->printResult();
   getch();
 
   endwin();
