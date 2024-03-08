@@ -14,13 +14,15 @@ XOGame::XOGame() {
 }
 
 void XOGame::printBoard(int board[]) {
+  char pieces[3] = {' ', 'X', 'O'};
     // clear(); // Clear the screen before printing the board
     attron(A_BOLD); // Make the text bold
     int row = 0;
     for (int i = 0; i < 3; ++i) {
         int col = 0;
         for (int j = 0; j < 3; ++j) {
-            mvprintw(row, col, " %d ", board[i * 3 + j]);
+            int piece = board[i * 3 + j];
+            mvprintw(row, col, " %c ", pieces[piece]);
             if (j < 2) mvprintw(row, col + 3, "|"); // Add vertical lines between cells
             col += 4;
         }
@@ -123,7 +125,7 @@ void XOGame::checkWinner() {
     this->winner = this->board[2];
     return;
   }
-  
+
   // Check for draw
   for (int i = 0; i < 9; ++i) {
     if (this->board[i] == 0) {
